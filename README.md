@@ -22,9 +22,6 @@ In TTS, a disc is four Custom AssetBundle objects:
 - **Base:** the subpicture bundle again, for always-visible layers. Only some discs
   need this one.
 
-Ports so far: **24** (complete, plays perfectly) and **The Amazing Race** (program and
-subpictures exported, dump not yet run).
-
 ---------------------------------------------------------------------------------------
 ## 0. What you need
 
@@ -39,7 +36,6 @@ subpictures exported, dump not yet run).
 Folder layout the kit expects:
 
 ```
-P:\DVD Rips\
   DVD Port Kit\            this kit (tools are run from here, never copied into discs)
   <Some Disc>\
     VIDEO_TS\              the rip
@@ -172,7 +168,6 @@ Skip this if `spu` found no images. Not every disc has highlights.
    resets them anyway; this just keeps saves clean.
 
 **Controls:**
-- **The picture:** click any button on it.
 - **The remote panel,** bottom right: arrows, OK, and Eject, which restarts the disc
   from First Play.
 - **Hotkeys:** bind DVD Up, Down, Left, Right and OK under Options → Game Keys.
@@ -223,9 +218,7 @@ change.
 ---------------------------------------------------------------------------------------
 ## 5. Disc bugs and fixes
 
-Discs ship with bugs. 24 has a dead end at Mission Briefing in about 1 game in 24, plus
-a fixed agent order that was meant to be random. Amazing Race has a quick-start
-shortcut that skips its reset. Patch them without touching the export, in
+Discs ship with bugs. Patch them without touching the export, in
 `TTS\sd_fixes.txt`:
 
 ```
@@ -244,30 +237,7 @@ P M1.53 post 0 7100000150000000...       replace the whole post section (index 0
   exactly as it was made.
 
 ---------------------------------------------------------------------------------------
-## 6. Troubleshooting
-
-Each of these happened once. They're fixed in the kit; the table is here so they're
-recognised if they come back.
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| Silent gap at each cell change; the browser player stalls audio too | The dump lost tail audio (§4) | `dvd_cells.py --tails` |
-| Picture freezes briefly between cells | Single-screen playback: a clip only starts preparing once the last one has ended | Use the kit's script; it alternates Screen A and B. Both must load the **same** video bundle. |
-| `VM Error ... Trying to access Non-Existent Bits` | TTS's Lua (MoonSharp) `bit32.extract` rejects fields that reach bit 31 | Fixed: the VM does bit operations in plain arithmetic. Don't reintroduce `bit32`. |
-| Menus play once and freeze | Clips not set to loop | Regenerate with the kit's `GenerateVideoCues.cs`, which reads `loop`. |
-| Black frame over the video, subpictures on top | Overlay root's MeshRenderer disabled, and TTS re-enabled it | Keep it enabled, with the clear Unlit/Transparent material (2b). |
-| TTS cube instead of the overlay | Overlay root's MeshRenderer removed | Same: keep it, with the clear material. |
-| Highlights misplaced, mirrored or rotated | The frame mesh's UVs don't match how the video is shown | Add a hand-aligned `_FRAME` Quad (2b step 4). |
-| Clicks land beside the buttons | Click layer not calibrated for this screen model | `lua uiCalibrate()` (§3). |
-| Two pictures flicker after loading a save | Both screens restored a cue | `lua resetScreens()` before saving. |
-| `no effect 'X'` in the console | The clip is missing from the bundle, or the bundle is out of date | Re-run `check`, then regenerate in Unity. |
-| Warm, hold or speed tricks for seamless playback | Don't: with both screens sharing one RenderTexture, a frozen or slowed player draws over the visible one | Preroll needs nothing beyond what the kit does. |
-| `Couldn't find VIDEO_TS\VIDEO_TS.IFO` | Wrong folder; the message lists what's in it | Point at the folder that *contains* VIDEO_TS (or VIDEO_TS itself). A trailing `\` is fine: port.py strips the stray quote PowerShell 5 adds. |
-| Multiplayer: some cell changes don't happen for players other than the host | Asking an object to play the effect it's already on restarts it on the host only | Fixed: a repeat goes via `Idle` first (`CONFIG.RETRIGGER_FRAMES`, default 3). If it still happens, raise it to 6–10. |
-| Lua memory or freeze when loading data | `JSON.decode` on large payloads | Everything is embedded as plain text lines; keep it that way. |
-
----------------------------------------------------------------------------------------
-## 7. Limits
+## 6. Limits
 
 The VM runs DVD command groups 0–3, which covers everything both ported discs use:
 - compare and goto;
@@ -291,7 +261,7 @@ If a disc needs any of these, the VM gets that feature added for that disc. That
 deliberate: features are added as discs need them, which keeps the VM small.
 
 ---------------------------------------------------------------------------------------
-## 8. Files
+## 7. Files
 
 | | |
 |---|---|
